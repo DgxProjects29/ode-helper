@@ -1,4 +1,4 @@
-from solvers import CauchyEuler, ParameterVariationN
+from solvers.solvers3 import CauchyEuler, ParameterVariationN
 
 class InvalidRequestException(Exception):
     """ invalid request provided by the user """
@@ -50,4 +50,6 @@ def get_solver_class(req, args):
     elif req == 'parameter-variation-n':
         return ParameterVariationN(args)
     else:
-        raise InvalidRequestException("It looks like you didn't specify the request or does not exit")
+        raise InvalidRequestException(
+            "It looks like you didn't specify the request or does not exit"
+        )

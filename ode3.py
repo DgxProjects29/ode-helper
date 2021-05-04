@@ -1,6 +1,5 @@
 import sys
 from request_proccesor import InvalidRequestException, PersonalStopException, get_solver_class
-from ode3_utils import SolverTemplate
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
@@ -9,7 +8,7 @@ PATH = "data/chromedriver.exe"
 CHROME_OPTIONS = Options()
 CHROME_OPTIONS.add_argument("--log-level=3")
 
-def start_program(solver_class: SolverTemplate):
+def start_program(solver_class):
 
     driver = webdriver.Chrome(PATH, options = CHROME_OPTIONS)
     

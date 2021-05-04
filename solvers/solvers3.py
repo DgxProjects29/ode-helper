@@ -1,5 +1,4 @@
-from ode3_utils import SolverTemplate, get_problem_url
-import solvers_utils
+import solvers.solvers_utils as solvers_utils
 import re
 import time
 
@@ -8,7 +7,7 @@ class InvalidInputException(Exception):
     """ invalid input provided by the user """
     pass
 
-class HomogeneousODEArgBase(SolverTemplate):
+class HomogeneousODEArgBase(solvers_utils.SolverTemplate):
 
     """
     parse ode in the following list of dicts
@@ -103,7 +102,7 @@ class CauchyEuler(HomogeneousODEArgBase):
     def find_solutions(self):
         print("find the results of the auxiliar equation")
 
-        self.driver.get(get_problem_url(f"{self.aux_equa} = 0"))
+        self.driver.get(solvers_utils.get_problem_url(f"{self.aux_equa} = 0"))
         result_section = solvers_utils.get_result_section(self.driver)
 
         print("Loading solutions...", end='\n')
@@ -117,13 +116,13 @@ class CauchyEuler(HomogeneousODEArgBase):
             sol_dict[index_key] = res
             print(f"{index_key}.  {res}")
 
-        input_message = "\nChoose the solutions separated by a dash:  "
+        input_message = "\nChoose the solutions separated by a dash, ex: 1-2:  "
         solution_string = str(input(input_message))
         print()
         sols = solution_string.split('-')
         self.msolutions = [sol_dict[int(sol_index)] for sol_index in sols]
 
-class ParameterVariationN(SolverTemplate):
+class ParameterVariationN(solvers_utils.SolverTemplate):
 
     def __init__(self, args):
         self.fx, *self.solset = args
@@ -154,7 +153,7 @@ class ParameterVariationN(SolverTemplate):
         print("find the wroskian of the sol set")
 
         solset_string = ",".join(self.solset)
-        self.driver.get(get_problem_url(f"wronskian({{{solset_string}}},x)"))
+        self.driver.get(solvers_utils.get_problem_url(f"wronskian({{{solset_string}}},x)"))
 
         print("Looking for the wroskian...", end='\n')
         
@@ -178,7 +177,7 @@ class ParameterVariationN(SolverTemplate):
             ))
         
         for i, w_det in enumerate(w_det_querys, start = 1):
-            self.driver.get(get_problem_url(w_det))
+            self.driver.get(solvers_utils.get_problem_url(w_det))
             result_section = solvers_utils.get_result_section(self.driver)
             res = solvers_utils.find_wf_res(
                 self.driver, 
@@ -199,7 +198,7 @@ class ParameterVariationN(SolverTemplate):
             wf_integrals.append(f"integrate[{uderi}]")
         
         for i, wf_integral in enumerate(wf_integrals, start = 1):
-            self.driver.get(get_problem_url(wf_integral))
+            self.driver.get(solvers_utils.get_problem_url(wf_integral))
             result_section = solvers_utils.get_result_section(self.driver)
             res = solvers_utils.find_wf_res(
                 self.driver, 

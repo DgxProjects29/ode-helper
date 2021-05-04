@@ -1,5 +1,5 @@
 import time
-
+import urllib.parse
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,8 +17,43 @@ document.querySelectorAll("._8J16o")[{pos}].dispatchEvent(event)
 TIMEOUT = 15
 RESULTS_SECTION_SELECTOR = "._2GT4c"
 RESULT_CONTAINER_SELECTOR = "._8J16o"
-# querySelector("._8J16o")NoSuchElementException
 
+WOLFRAM_URL = "https://www.wolframalpha.com/input/?i={expression}"
+
+class SolverTemplate:
+
+    def set_driver(self, driver):
+        self.driver = driver
+
+    def parse_input(self):
+        pass
+
+    def init(self):
+        self.func_steps = []
+        self.title = "No title"
+        #steps_func
+        self.init_solver()
+        self.print_title()
+        self.print_header()
+
+    def print_header(self):
+        pass
+    
+    def get_func_steps(self):
+        return self.func_steps
+
+    def print_title(self):
+        print(f"-------------------{self.title}-------------------\n\n")
+
+    def finish_solver(self):
+        pass
+
+    def loop_steps(self):
+        self.ste
+
+def get_problem_url(expression):
+    parsed_exp = urllib.parse.quote(expression)
+    return WOLFRAM_URL.format(expression = parsed_exp)
 
 def get_wf_derivative(func, order):
     if order == 0:
