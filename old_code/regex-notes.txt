@@ -1,0 +1,17 @@
+(([+]|[-])*\w+)y('*)
+([^-+\s ]*)y
+
+ignore al signo
+([^-+\s ]*)y('*)
+
+([+]|[-])+([^\s ]*)y('*)
+([-+])+([^\s ]*)y('*)
+
+split by sign, then apply regex to the term
+
+([-+])*([^\s ]*)y('*)
+([-+]){0,1}([^\s ]*)y('*)
+([-+]){0,1}([^-+\s ]*)y('*)
+
+final and works for the whole EDO
+([-+]){0,1}([^-+\s ]*)y('*)
