@@ -1,48 +1,8 @@
-import solvers.solvers_utils as solvers_utils
+from solvers import solvers_utils
 import re
 import time
 
-# There is no validation
-class InvalidInputException(Exception):
-    """ invalid input provided by the user """
-    pass
-
-class HomogeneousODEArgBase(solvers_utils.SolverTemplate):
-
-    """
-    parse ode in the following list of dicts
-
-    {
-        sign: +|-
-        coef: <coef>
-        order
-    }
-
-    """
-
-    ode_pattern = r"([-+]){0,1}([^-+\s ]*)y('*)"
-
-    def __init__(self, ode):
-        self.ode = ode
-        self.terms = []
-
-    def parse_ode(self):
-        work_ode = self.ode.replace(' ', '') # clean spaces
-        matchs = re.finditer(self.ode_pattern, work_ode)
-        for match in matchs:
-            sign = match.group(1) or '+'
-            coef = match.group(2) or '1'
-            order = len(match.group(3)) or 0
-            self.terms.append({
-                'sign': sign,
-                'coef': coef,
-                'order': order
-            })
-    
-    def print_ode_header(self):
-        print(f"ODE:  {self.ode}")
-
-class CauchyEuler(HomogeneousODEArgBase):
+class CauchyEuler(solvers_utils.HomogeneousODEArgBase):
 
     digit_coef_pattern = r"(\d+)x*"
 

@@ -1,4 +1,5 @@
 import time
+import re
 import urllib.parse
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -50,6 +51,46 @@ class SolverTemplate:
 
     def loop_steps(self):
         self.ste
+
+class HomogeneousODEArgBase(SolverTemplate):
+
+    """
+    parse ode in the following list of dicts
+
+    {
+        sign: +|-
+        coef: <coef>
+        order
+    }
+
+    """
+
+    ode_pattern = r"([-+]){0,1}([^-+\s ]*)y('*)"
+
+    def __init__(self, ode):
+        self.ode = ode
+        self.terms = []
+
+    def parse_ode(self):
+        work_ode = self.ode.replace(' ', '') # clean spaces
+        matchs = re.finditer(self.ode_pattern, work_ode)
+        for match in matchs:
+            sign = match.group(1) or '+'
+            coef = match.group(2) or '1'
+            order = len(match.group(3)) or 0
+            self.terms.append({
+                'sign': sign,
+                'coef': coef,
+                'order': order
+            })
+    
+    def print_ode_header(self):
+        print(f"ODE:  {self.ode}")
+
+# There is no validation
+class InvalidInputException(Exception):
+    """ invalid input provided by the user """
+    pass
 
 def get_problem_url(expression):
     parsed_exp = urllib.parse.quote(expression)
