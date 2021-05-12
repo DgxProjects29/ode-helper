@@ -1,4 +1,4 @@
-from solvers.solvers4 import LaplaceLineal
+from solvers.solvers4 import CompactFunction, LaplaceLineal
 from solvers.solvers3 import CauchyEuler, ParameterVariationN
 
 class InvalidRequestException(Exception):
@@ -45,7 +45,8 @@ parameter-variation-n "csc(3x)/4" "cos(3x)" "sin(3x)"
 
 laplace-lineal "y' + 3y" "13sin(2t)" "y(0)=1"
 laplace-lineal "y'' - 3y' + 2y" "e^(-4t)" "y(0)=1" "y'(0)=5"
-
+compact-function "2,0" "-1,2" "0,3"
+compact-function "20t, 0" "0, 5"
 """
 def get_solver_class(req, args):
 
@@ -55,6 +56,8 @@ def get_solver_class(req, args):
         return ParameterVariationN(args)
     elif req == 'laplace-lineal':
         return LaplaceLineal(*args)
+    elif req == 'compact-function':
+        return CompactFunction(args)
     else:
         raise InvalidRequestException(
             "It looks like you didn't specify the request or does not exit"

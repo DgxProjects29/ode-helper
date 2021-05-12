@@ -143,3 +143,78 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
             y = self.y
         ))
         print(res)
+
+class CompactFunction(solvers_utils.SolverTemplate):
+
+    def __init__(self, args):
+        self.raw_parts = args
+
+    def parse_input(self):
+        self.parts = []
+        for raw_part in self.raw_parts:
+            part_function, activate_number = raw_part.replace(' ', '') \
+                .split(',');
+            part_item = {
+                'part_function': part_function, 
+                'activate_number': activate_number
+            }
+            self.parts.append(part_item)
+     
+
+    def init_solver(self):
+        self.title = "Compact Function"
+        self.create_term_parts()
+        self.create_compact_function()
+        self.simplified_compact_function = ""
+        self.func_steps = [
+            self.simplify_function            
+        ]
+
+    def create_compact_function(self):
+        w_part = ' + '.join(self.term_parts)
+        self.compact_function = f"{self.parts[0]['part_function']} + {w_part}"
+        
+    def create_term_parts(self):
+        term_template = "{w_part}u(t - {an})" 
+        self.term_parts = []
+        n = len(self.parts)
+        for i in range(1, n):
+            item0 = self.parts[i - 1]
+            item = self.parts[i]
+            w_part = f"(({item['part_function']}) - ({item0['part_function']}))"
+            an = item['activate_number']
+            self.term_parts.append(term_template.format(
+                w_part = w_part,
+                an = an
+            ))
+
+    def print_header(self):
+        for part in self.parts:
+            print("Part function: ", part['part_function'])
+            print("Activate number: ", part['activate_number'])
+            print("----------")
+
+        print()
+        print("compact function: ", self.compact_function, end='\n\n')
+
+    def finish_solver(self):
+        print("Compact Function: ")
+        print("f(t) = ", self.compact_function)
+        print("f(t) = ", self.simplified_compact_function)
+
+    def simplify_function(self):
+        print("simplify function...")
+       
+        wolfram_query = solvers_utils.get_problem_url(self.compact_function)
+        self.driver.get(wolfram_query)
+        
+        result_section = solvers_utils.get_result_section(self.driver)
+        self.simplified_compact_function = solvers_utils.find_wf_res(
+            self.driver, 
+            result_section, 
+            1
+        )
+
+
+        
+    
