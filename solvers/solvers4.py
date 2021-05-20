@@ -1,5 +1,8 @@
+from ode2 import get_problem_url
+from solvers.laplace_parsers import LaplaceParser, Translation1, Translation2, Translation2Inverse
 from solvers import solvers_utils
 import textwrap
+import re
 
 class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
 
@@ -214,6 +217,123 @@ class CompactFunction(solvers_utils.SolverTemplate):
             result_section, 
             1
         )
+
+
+class LaplaceProperty(solvers_utils.SolverTemplate):
+
+    property_mappers = [
+        {
+            'name': "Translation 1",
+            'parse_class': Translation1,
+            'regex_pattern': r"e\^\((-{0,1})(\w*)t\)|e\^-{0,1}t"
+        },
+        {
+            'name': "Translation 2",
+            'parse_class': Translation2,
+            'regex_pattern': r"u\(t-(\w+)\)"
+        },
+        {
+            'name': "Translation 2 Inverse",
+            'parse_class': Translation2Inverse,
+            'regex_pattern': r"e\^\(-(\w*)s\)|e\^-s"
+        },
+    ]
+    
+    def __init__(self, expression):
+        self.expression = expression
+        self.parse_class: LaplaceParser = None
+        self.property_name = 'no title'
+
+    def parse_input(self):
+        self.clean_expression = self.expression \
+            .replace(' ', '')
+        for property_map in self.property_mappers:
+            match = re.search(property_map['regex_pattern'], self.clean_expression)
+
+            if match:
+                self.parse_class = property_map['parse_class'](
+                    match, self.expression
+                )
+                self.property_name = property_map['name']
+                break
+
+        if self.parse_class:
+            self.parse_class.apply_property()
+
+    def init_solver(self):
+        self.title = self.property_name
+        self.new_laplace_sol = ""
+        self.func_steps = [
+            self.solve_laplace_by_user            
+        ]
+
+    def create_compact_function(self):
+        w_part = ' + '.join(self.term_parts)
+        self.compact_function = f"{self.parts[0]['part_function']} + {w_part}"
+        
+    def create_term_parts(self):
+        term_template = "{w_part}u(t - {an})" 
+        self.term_parts = []
+        n = len(self.parts)
+        for i in range(1, n):
+            item0 = self.parts[i - 1]
+            item = self.parts[i]
+            w_part = f"(({item['part_function']}) - ({item0['part_function']}))"
+            an = item['activate_number']
+            self.term_parts.append(term_template.format(
+                w_part = w_part,
+                an = an
+            ))
+
+    def print_header(self):
+        print(f"expression given: {self.expression}")
+        print(f"new expression: {self.parse_class.get_new_expression()}")
+
+    def finish_solver(self):
+        ftext = """
+        Summary:
+
+        your expression = {expression}
+        new expression = {new_expression}
+        new laplace = {new_laplace}
+        new laplace expression solution = {new_laplace_sol}
+        """
+        res = textwrap.dedent(ftext.format(
+            expression = self.expression,
+            new_expression = self.parse_class.get_new_expression(),
+            new_laplace = self.parse_class.get_new_laplace(),
+            new_laplace_sol = self.new_laplace_sol
+        ))
+        print(res)
+        
+    def solve_laplace_by_user(self):
+        if self.parse_class:
+            self.parse_class.apply_property()
+
+            print("what do you want to do?")
+
+            ans = input(
+                f"solve the new laplace expression: {self.parse_class.get_new_laplace()} [y/n]: "  
+            )
+
+            if ans == 'y':
+                wolfram_url = get_problem_url(
+                    self.parse_class.get_wolfram_query()
+                )
+
+                print("Looking for result...")
+
+                self.driver.get(wolfram_url)
+                result_section = solvers_utils.get_result_section(self.driver)
+                self.new_laplace_sol = solvers_utils.find_wf_res(
+                    self.driver, 
+                    result_section, 
+                    1
+                )
+
+                print(f"Found: {self.new_laplace_sol}")
+        else:
+            print("it look likes we couldn't found a property for this expression...")
 
 
         
