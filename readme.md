@@ -18,17 +18,17 @@ all commands have the following structure,
 python ode3.py <request> <arg1> <arg2> <argn>.....
 ```
 
-they expressions are written as if you were in wolfram-alpha, also ode's must be written in prime notation.
+the expressions are written as if you were in wolfram-alpha, also ode's must be written in prime notation.
 
 ##### Cauchy Euler
 
-give you the m solutions of the auxiliar equation
+give you the 'm' solutions of the auxiliar equation
 
 ```
 cauchy-euler <homogeneous-ode>
 ```
 
-homogeneous-ode: the left member of the equation, because it's homogeneous and we are going to solve the auxiliar equation
+* homogeneous-ode: the left member of the equation, because it's homogeneous and we are going to solve the auxiliar equation
 
 examples:
 
@@ -45,8 +45,8 @@ give you the 'u' solutions to create the particular solution
 parameter-variation-n <fx> <sol1> <sol2> <sol3>...
 ```
 
-fx: the function in the right member of the equation, what makes the ode no homogeneous
-sol1,sol2,sol3: solutions of the associated homogeneous ode
+* fx: the function in the right member of the equation, what makes the ode no homogeneous
+* sol1,sol2,sol3: solutions of the associated homogeneous ode
 
 examples:
 
@@ -63,9 +63,9 @@ solve a constant coefficients equation using laplace
 laplace-lineal <homogeneous-ode> <fx> <pvi1> <pvi2>...
 ```
 
-homogeneous-ode: the left member of the equation
-fx: the function in the right member of the equation, what makes the ode no homogeneous
-pvi: ode pvi
+* homogeneous-ode: the left member of the equation
+* fx: the function in the right member of the equation, what makes the ode no homogeneous
+* pvi: ode pvi
 
 examples:
 
@@ -81,13 +81,13 @@ compact a function by parts using the heaviside step function
 
 the structure of the function by parts is the following
 
-![structure-function-by-parts](docs_imgs\function_by_parts.PNG "structure-function-by-parts")
+![structure-function-by-parts](docs_imgs/function_by_parts.PNG "structure-function-by-parts")
 
 ```
 compact-function <part1> <part2> <part3...>
 ```
 
-parts: function-Anumber pair that represents the function by parts
+* parts: function-Anumber pair that represents the function by parts
 
 examples:
 
@@ -108,7 +108,7 @@ tries to apply one of the following properties
 laplace-property <expression>
 ```
 
-expression: the function f(t) or F(s)
+* expression: the function f(t) or F(s)
 
 examples:
 
