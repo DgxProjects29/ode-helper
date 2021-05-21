@@ -117,4 +117,6 @@ python ode3.py laplace-property "3t*u(t-1)"
 python ode3.py laplace-property "e^(5t)t^3"
 python ode3.py laplace-property "e^(-2t)cos(4t)"
 python ode3.py laplace-property "e^(-pis)/(s^2+1)"
+python ode3.py laplace-property "t^2*sin(t)"
 ```
+

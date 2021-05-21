@@ -96,10 +96,10 @@ def get_problem_url(expression):
     parsed_exp = urllib.parse.quote(expression)
     return WOLFRAM_URL.format(expression = parsed_exp)
 
-def get_wf_derivative(func, order):
+def get_wf_derivative(func, order, variable = 'x'):
     if order == 0:
         return func
-    xres = ",x"*order
+    xres = f",{variable}"*order
     return f"D[{func}{xres}]"
 
 

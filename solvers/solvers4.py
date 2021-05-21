@@ -1,5 +1,5 @@
 from ode2 import get_problem_url
-from solvers.laplace_parsers import LaplaceParser, Translation1, Translation2, Translation2Inverse
+from solvers.laplace_parsers import DerivativeLaplace, LaplaceParser, Translation1, Translation2, Translation2Inverse
 from solvers import solvers_utils
 import textwrap
 import re
@@ -237,12 +237,17 @@ class LaplaceProperty(solvers_utils.SolverTemplate):
             'parse_class': Translation2Inverse,
             'regex_pattern': r"e\^\(-(\w*)s\)|e\^-s"
         },
+        {
+            'name': "Laplace Derivative",
+            'parse_class': DerivativeLaplace,
+            'regex_pattern': r"t\^(\d+)"
+        },
     ]
     
     def __init__(self, expression):
         self.expression = expression
         self.parse_class: LaplaceParser = None
-        self.property_name = 'no title'
+        self.property_name = 'No Property Applied'
 
     def parse_input(self):
         self.clean_expression = self.expression \
@@ -287,24 +292,26 @@ class LaplaceProperty(solvers_utils.SolverTemplate):
 
     def print_header(self):
         print(f"expression given: {self.expression}")
-        print(f"new expression: {self.parse_class.get_new_expression()}")
+        if self.parse_class:
+            print(f"new expression: {self.parse_class.get_new_expression()}")
 
     def finish_solver(self):
-        ftext = """
-        Summary:
+        if self.parse_class:
+            ftext = """
+            Summary:
 
-        your expression = {expression}
-        new expression = {new_expression}
-        new laplace = {new_laplace}
-        new laplace expression solution = {new_laplace_sol}
-        """
-        res = textwrap.dedent(ftext.format(
-            expression = self.expression,
-            new_expression = self.parse_class.get_new_expression(),
-            new_laplace = self.parse_class.get_new_laplace(),
-            new_laplace_sol = self.new_laplace_sol
-        ))
-        print(res)
+            your expression = {expression}
+            new expression = {new_expression}
+            new laplace = {new_laplace}
+            new laplace expression solution = {new_laplace_sol}
+            """
+            res = textwrap.dedent(ftext.format(
+                expression = self.expression,
+                new_expression = self.parse_class.get_new_expression(),
+                new_laplace = self.parse_class.get_new_laplace(),
+                new_laplace_sol = self.new_laplace_sol
+            ))
+            print(res)
         
     def solve_laplace_by_user(self):
         if self.parse_class:

@@ -1,3 +1,5 @@
+from solvers import solvers_utils
+
 class LaplaceParser:
 
     laplace_type = ""
@@ -8,7 +10,7 @@ class LaplaceParser:
         self.laplace_expression = laplace_expression
         # after applying the property
         self.new_laplace = ""
-        self.new_expression = ""
+        self.new_expression = "No new expression found"
 
     def apply_property(self):
         pass
@@ -77,3 +79,24 @@ class Translation2Inverse(LaplaceParser):
 
         self.new_expression = \
             f"{u_expression} * L^-1{{{self.new_laplace}}} | {translation}"
+
+
+class DerivativeLaplace(LaplaceParser):
+
+    laplace_type = "L"
+    laplace_command = "LaplaceTransform[{nl}, t, s]"
+
+    def apply_property(self):
+        n = int(self.match.group(1))
+        sign = '' if n % 2 == 0 else '-'
+
+        self.new_laplace = self.laplace_expression.replace(self.match[0], "*1")
+        if self.new_laplace[0] == '*':
+            self.new_laplace = self.new_laplace[1:]
+        derivative_exp = solvers_utils.get_wf_derivative(
+            f"L{{{self.new_laplace}}}",
+            n,
+            variable = 's'
+        )
+        
+        self.new_expression = f"{sign} {derivative_exp}"
