@@ -24,7 +24,7 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
         self.ys = ""
 
         self.func_steps = [
-            self.find_laplace_for_fx,
+            self.find_laplace_for_ft,
             self.solving_the_equation,
             self.find_y
         ]
@@ -74,10 +74,11 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
         line5 = f"pvi = {self.pvi}\n"
         print(line2+line3+line4+line5)
 
-    def find_laplace_for_fx(self):
+    def find_laplace_for_ft(self):
 
         print(f"apply laplace transform to f(t): {self.ft}")
-
+        self.ft = self.ft.replace("u","θ")
+        
         self.driver.get(
             solvers_utils.get_problem_url(f"LaplaceTransform[{self.ft}, t, s]")
         )
@@ -343,5 +344,49 @@ class LaplaceProperty(solvers_utils.SolverTemplate):
             print("it look likes we couldn't found a property for this expression...")
 
 
-        
+class Convolution(solvers_utils.SolverTemplate):
     
+    def __init__(self, ft, gt):
+        self.ft = ft
+        self.gt = gt
+
+    def parse_input(self):
+        
+        new_ft = self.ft.replace('t', 'τ')
+        new_gt = self.gt.replace('t', 't - τ')
+
+        self.convolution_integral = \
+            f"integrate[{new_ft} * {new_gt}, {{τ, 0, t}}]"
+
+    def init_solver(self):
+        self.title = "Convolution"
+        self.convolution_result = ""
+        self.func_steps = [
+            self.compute_convolution_integral            
+        ]
+    
+    def print_header(self):
+        print("f(t) = ", self.ft)
+        print("g(t) = ", self.gt)
+        print("ci = ", self.convolution_integral)
+
+    def compute_convolution_integral(self):
+        
+        wolfram_url = get_problem_url(
+            self.convolution_integral.replace('τ', 'x')
+        )
+
+        print("Looking for result...")
+
+        self.driver.get(wolfram_url)
+        result_section = solvers_utils.get_result_section(self.driver)
+        self.convolution_result = solvers_utils.find_wf_res(
+            self.driver, 
+            result_section, 
+            2
+        )
+
+        print(f"Found: {self.convolution_result}")
+  
+    def finish_solver(self):
+        print("Convolution result:  ",self.convolution_result)

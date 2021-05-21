@@ -1,4 +1,4 @@
-from solvers.solvers4 import CompactFunction, LaplaceLineal, LaplaceProperty
+from solvers.solvers4 import CompactFunction, Convolution, LaplaceLineal, LaplaceProperty
 from solvers.solvers3 import CauchyEuler, ParameterVariationN
 
 class InvalidRequestException(Exception):
@@ -21,6 +21,8 @@ def get_solver_class(req, args):
         return CompactFunction(args)
     elif req == 'laplace-property':
         return LaplaceProperty(*args)
+    elif req == 'convolution':
+        return Convolution(*args)
     else:
         raise InvalidRequestException(
             "It looks like you didn't specify the request or does not exit"
