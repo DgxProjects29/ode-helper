@@ -102,6 +102,9 @@ def get_wf_derivative(func, order, variable = 'x'):
     xres = f",{variable}"*order
     return f"D[{func}{xres}]"
 
+def get_wf_integral(func, variable = 'x'):
+    return f"Integrate[{func}, {variable}]"
+
 
 def get_wfset_from_list(l):
     join_list = ",".join(l)

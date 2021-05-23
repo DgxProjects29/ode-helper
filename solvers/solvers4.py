@@ -94,6 +94,15 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
 
         print(f"Lpt found: {self.ft_laplace_transform}")
 
+        extra_term = str(input(
+            "add extra term: "  
+        ))
+
+        if extra_term:
+            self.ft_laplace_transform + f" + {extra_term}"
+
+        
+
     def solving_the_equation(self):
 
         print("find the solution for Y(s) (x in the expression):")
