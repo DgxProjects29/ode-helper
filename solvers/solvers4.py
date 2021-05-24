@@ -21,6 +21,7 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
         self.create_template_laplace_equa()
 
         self.ft_laplace_transform = ""
+        self.extra_term = ""
         self.ys = ""
 
         self.func_steps = [
@@ -58,11 +59,12 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
         
         self.template_laplace_equa = equa
 
-        for y_exp in self.pvi:
-            y_exp = y_exp.replace(" ", "")
-            key_repl, to_repl = y_exp.split('=')
-            equa = equa.replace(key_repl, to_repl)
-        
+        if self.pvi:
+            for y_exp in self.pvi:
+                y_exp = y_exp.replace(" ", "")
+                key_repl, to_repl = y_exp.split('=')
+                equa = equa.replace(key_repl, to_repl)
+            
         self.laplace_equa = equa.replace("Y(s)", "x").replace("(x)", "x")
 
 
@@ -94,19 +96,16 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
 
         print(f"Lpt found: {self.ft_laplace_transform}")
 
-        extra_term = str(input(
+        self.extra_term = str(input(
             "add extra term: "  
         ))
-
-        if extra_term:
-            self.ft_laplace_transform + f" + {extra_term}"
-
         
 
     def solving_the_equation(self):
 
         print("find the solution for Y(s) (x in the expression):")
-        equa = f"Solve[{self.laplace_equa} = {self.ft_laplace_transform}, x]"
+        extra_term = f" + {self.extra_term}" if self.extra_term else ""
+        equa = f"Solve[{self.laplace_equa} = {self.ft_laplace_transform}{extra_term}, x]"
         print(f"equa: {equa}")
 
         self.driver.get(solvers_utils.get_problem_url(equa))
@@ -148,12 +147,14 @@ class LaplaceLineal(solvers_utils.HomogeneousODEArgBase):
         L{{{ft}}} = {ft_laplace_transform}
         Y(s) = {ys}
         y(t) = {y}
+        extra term: {extra_term}
         """
         res = textwrap.dedent(ftext.format(
             ft = self.ft,
             ft_laplace_transform = self.ft_laplace_transform,
             ys = self.ys,
-            y = self.y
+            y = self.y,
+            extra_term = self.extra_term
         ))
         print(res)
 
@@ -362,7 +363,7 @@ class Convolution(solvers_utils.SolverTemplate):
     def parse_input(self):
         
         new_ft = self.ft.replace('t', 'τ')
-        new_gt = self.gt.replace('t', 't - τ')
+        new_gt = self.gt.replace('t', '(t - τ)')
 
         self.convolution_integral = \
             f"integrate[{new_ft} * {new_gt}, {{τ, 0, t}}]"
@@ -392,7 +393,7 @@ class Convolution(solvers_utils.SolverTemplate):
         self.convolution_result = solvers_utils.find_wf_res(
             self.driver, 
             result_section, 
-            2
+            0
         )
 
         print(f"Found: {self.convolution_result}")
