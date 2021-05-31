@@ -158,9 +158,14 @@ class FieldLineIntegral(solvers_utils.SolverTemplate):
 
     def parse_input(self):
         n = len(self.param_function)
+        default_variables = ['x', 'y', 'z',]
         components = self.param_function[1:n - 1].split(',')
-        self.replaced_function = self.fxy.replace('x', f"({components[0]})") \
-            .replace('y',f"({components[1]})")
+        replace_function = self.fxy
+        for i, component in enumerate(components):
+            replace_function = replace_function.replace(
+                default_variables[i], f"({component})"
+        )
+        self.replaced_function = replace_function
     
     def init_solver(self):
         self.title = "Field Line Integral"
